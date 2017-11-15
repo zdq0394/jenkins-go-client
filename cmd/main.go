@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/zdq0394/jenkins-go-client/gojenkins"
+	"github.com/zdq0394/jenkins-go-client/template"
 )
 
 func getAllJobs(jenkins *gojenkins.Jenkins) {
@@ -55,7 +56,7 @@ func main() {
 	jenkinsURL := "http://123.59.204.155:8080/"
 	username := "admin"
 	password := "a8ccd5481d6342b992543321928e1861"
-	jobName := "auto_build"
+	//jobName := "auto_build"
 	jenkins := gojenkins.CreateJenkins(nil, jenkinsURL, username, password)
 	_, err := jenkins.Init()
 	if err != nil {
@@ -64,5 +65,10 @@ func main() {
 	fmt.Println(jenkins.Version)
 	fmt.Println(jenkins.Server)
 
-	getJob(jenkins, jobName)
+	jobConfig := template.GetJobConfig()
+	fmt.Println(jobConfig)
+	_, err = jenkins.CreateJobInFolder(jobConfig, "branch_test", "hub", "zdq0394", "docker_example")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
