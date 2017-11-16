@@ -1,8 +1,3 @@
-package template
-
-import "fmt"
-
-const templ_prefix = `
 <project>
   <actions/>
   <description></description>
@@ -48,6 +43,7 @@ const templ_prefix = `
       <hudson.plugins.git.UserRemoteConfig>
         <refspec>+refs/heads/{{.BranchName}}:refs/remotes/origin/{{.BranchName}}</refspec>
         <url>{{.ProjectURL}}</url>
+        <credentialsId>{{.CredentialsId}}</credentialsId>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -71,10 +67,9 @@ const templ_prefix = `
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-	  <command>COMMIT_ID=`
+	  <command>
 
-const templ_mid = "`git rev-parse --short HEAD`"
-const templ_last = `
+COMMIT_ID=`git rev-parse --short HEAD`
 if [ $OVERRIDE = &quot;True&quot; ] ; then
     DOCKER_TAG=$IMAGE_TAG_PREFIX
 else
@@ -83,7 +78,7 @@ fi
 
 docker build -t $REGISTRY/$REPO_NAMESPACE/$REPO_NAME:$DOCKER_TAG -f my_ubuntu/Dockerfile .
 
-</command>
+      </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
@@ -95,8 +90,4 @@ docker build -t $REGISTRY/$REPO_NAMESPACE/$REPO_NAME:$DOCKER_TAG -f my_ubuntu/Do
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
     <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.8"/>
   </buildWrappers>
-</project> `
-
-func GetTemplate() string {
-	return fmt.Sprintf("%s%s%s", templ_prefix, templ_mid, templ_last)
-}
+</project>

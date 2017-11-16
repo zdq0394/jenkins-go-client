@@ -52,6 +52,14 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 	fmt.Println(build.GetConsoleOutput())
 }
 
+func createJob(jenkins *gojenkins.Jenkins) {
+	jobConfig := template.GetJobTagConfig()
+	fmt.Println(jobConfig)
+	_, err := jenkins.CreateJobInFolder(jobConfig, "tags_release", "hub", "zdq0394", "docker_example")
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 func main() {
 	jenkinsURL := "http://123.59.204.155:8080/"
 	username := "admin"
@@ -62,13 +70,7 @@ func main() {
 	if err != nil {
 		panic("Something Went Wrong")
 	}
-	fmt.Println(jenkins.Version)
-	fmt.Println(jenkins.Server)
+	//getJob(jenkins, "build_private")
+	createJob(jenkins)
 
-	jobConfig := template.GetJobConfig()
-	fmt.Println(jobConfig)
-	_, err = jenkins.CreateJobInFolder(jobConfig, "branch_test", "hub", "zdq0394", "docker_example")
-	if err != nil {
-		fmt.Println(err)
-	}
 }
