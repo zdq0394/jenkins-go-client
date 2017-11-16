@@ -514,6 +514,16 @@ func (j *Jenkins) Poll() (int, error) {
 	return resp.StatusCode, nil
 }
 
+func (j *Jenkins) CreateCredentials(credentialData string) error {
+	credObject := Credentials{Jenkins: j, Raw: new(CredentialsResponse), Base: "/credentials/store/system/domain/_/"}
+	return credObject.Create(credentialData)
+}
+
+func (j *Jenkins) GetAllCredentials() ([]UserCredential, error) {
+	credObject := Credentials{Jenkins: j, Raw: new(CredentialsResponse), Base: "/credentials/store/system/domain/_/"}
+	return credObject.GetAll()
+}
+
 // Creates a new Jenkins Instance
 // Optional parameters are: client, username, password
 // After creating an instance call init method.
