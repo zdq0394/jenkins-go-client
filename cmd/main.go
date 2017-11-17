@@ -52,15 +52,6 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 	fmt.Println(build.GetConsoleOutput())
 }
 
-func createJob(jenkins *gojenkins.Jenkins) {
-	jobConfig := template.GetJobTagConfig()
-	fmt.Println(jobConfig)
-	_, err := jenkins.CreateJobInFolder(jobConfig, "tags_release", "hub", "zdq0394", "docker_example")
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 func createCredentials(jenkins *gojenkins.Jenkins) {
 	data := `json={
 		"": "0",
@@ -76,6 +67,45 @@ func createCredentials(jenkins *gojenkins.Jenkins) {
 	`
 	jenkins.CreateCredentials(data)
 }
+
+func getAllCredentials(jenkins *gojenkins.Jenkins) {
+	creds, err := jenkins.GetAllCredentials()
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, cred := range creds {
+		fmt.Println(cred.ID)
+		fmt.Println(cred.FullName)
+	}
+}
+
+func createBranchJob(jenkins *gojenkins.Jenkins) {
+	var branch template.JobBranchConfig
+	branch.ProjectURL = "https://github.com/zdq0394/docker_example"
+	branch.BranchName = "develop"
+	branch.Registry = "reg.qiniu.com"
+	branch.RepoNamespace = "zhangdongqi"
+	branch.RepoName = "docker_example"
+	branch.ImageTagPrefix = "develop"
+	branch.Override = "True"
+	branch.CredentialsId = "zdq0394"
+	config := branch.ToConfigString()
+	jenkins.CreateJobInFolder(config, "AA", "hub", "zdq0394", "docker_example")
+}
+
+func createTagJob(jenkins *gojenkins.Jenkins) {
+	var tag template.JobTagConfig
+	tag.ProjectURL = "https://github.com/zdq0394/docker_example"
+	tag.Registry = "reg.qiniu.com"
+	tag.RepoNamespace = "zhangdongqi"
+	tag.RepoName = "docker_example"
+	tag.Override = "True"
+	tag.CredentialsId = "zdq0394"
+	tag.ProjectTagLike = "release*"
+	config := tag.ToConfigString()
+	jenkins.CreateJobInFolder(config, "BB", "hub", "zdq0394", "docker_example")
+}
+
 func main() {
 	jenkinsURL := "http://123.59.204.155:8080/"
 	username := "admin"
@@ -86,12 +116,8 @@ func main() {
 	if err != nil {
 		panic("Something Went Wrong")
 	}
-	//getJob(jenkins, "build_private")
-	//createJob(jenkins)
-	//createCredentials(jenkins)
-	creds, err := jenkins.GetAllCredentials()
-	for _, cred := range creds {
-		fmt.Println(cred.ID)
-		fmt.Println(cred.FullName)
-	}
+
+	createBranchJob(jenkins)
+	createTagJob(jenkins)
+
 }

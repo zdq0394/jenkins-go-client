@@ -9,47 +9,38 @@ import (
 )
 
 type JobConfig struct {
-	ProjectURL     string
-	BranchName     string
-	ProjectTagLike string
-	Registry       string
-	RepoNamespace  string
-	RepoName       string
-	ImageTagPrefix string
-	Override       string
-	CredentialsId  string
+	Registry      string
+	RepoNamespace string
+	RepoName      string
+	Override      string
+	CredentialsId string
+	ProjectURL    string
 }
 
-func GetJobBranchConfig() string {
+type JobBranchConfig struct {
+	JobConfig
+	BranchName     string
+	ImageTagPrefix string
+}
+
+type JobTagConfig struct {
+	JobConfig
+	ProjectTagLike string
+}
+
+func (job JobBranchConfig) ToConfigString() string {
 	t := template.Must(template.New("escape").Parse(GetBranchTemplateFromFile()))
-	var data JobConfig
-	data.ProjectURL = "https://github.com/zdq0394/docker_example"
-	data.BranchName = "develop"
-	data.Registry = "reg.qiniu.com"
-	data.RepoNamespace = "zhangdongqi"
-	data.RepoName = "docker_example"
-	data.ImageTagPrefix = "develop"
-	data.Override = "True"
-	data.CredentialsId = "zdq0394"
 	config := bytes.NewBufferString("")
-	if err := t.Execute(config, data); err != nil {
+	if err := t.Execute(config, job); err != nil {
 		log.Fatal(err)
 	}
 	return config.String()
 }
 
-func GetJobTagConfig() string {
-	t := template.Must(template.New("escape").Parse(GetJobTemplateFromFile()))
-	var data JobConfig
-	data.ProjectURL = "https://github.com/zdq0394/docker_example"
-	data.Registry = "reg.qiniu.com"
-	data.RepoNamespace = "zhangdongqi"
-	data.RepoName = "docker_example"
-	data.Override = "True"
-	data.CredentialsId = "zdq0394"
-	data.ProjectTagLike = "release*"
+func (job JobTagConfig) ToConfigString() string {
+	t := template.Must(template.New("escape").Parse(GetTagTemplateFromFile()))
 	config := bytes.NewBufferString("")
-	if err := t.Execute(config, data); err != nil {
+	if err := t.Execute(config, job); err != nil {
 		log.Fatal(err)
 	}
 	return config.String()
@@ -59,7 +50,7 @@ func GetBranchTemplateFromFile() string {
 	return GetTemplate("../template/job.branch.tpl")
 }
 
-func GetJobTemplateFromFile() string {
+func GetTagTemplateFromFile() string {
 	return GetTemplate("../template/job.tag.tpl")
 }
 
