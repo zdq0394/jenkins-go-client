@@ -519,6 +519,11 @@ func (j *Jenkins) CreateCredentials(credentialData string) error {
 	return credObject.Create(credentialData)
 }
 
+func (j *Jenkins) RemoveCredentials(credentialsID string) error {
+	credObject := Credentials{Jenkins: j, Raw: new(CredentialsResponse), Base: "/credentials/store/system/domain/_/"}
+	return credObject.Remove(credentialsID)
+}
+
 func (j *Jenkins) GetAllCredentials() ([]UserCredential, error) {
 	credObject := Credentials{Jenkins: j, Raw: new(CredentialsResponse), Base: "/credentials/store/system/domain/_/"}
 	return credObject.GetAll()

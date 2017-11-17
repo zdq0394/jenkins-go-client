@@ -53,19 +53,29 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 }
 
 func createCredentials(jenkins *gojenkins.Jenkins) {
-	data := `json={
-		"": "0",
-		"credentials": {
-		  "scope": "GLOBAL",
-		  "id": "auto-test2",
-		  "username": "zdq0395",
-		  "password": "c17551ff8604d4f1eff12accf27559ea5d9823a2",
-		  "description": "accesstoken for zdq0395",
-		  "$class": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl"
-		}
-	  }
-	`
-	jenkins.CreateCredentials(data)
+	// data := `json={
+	// 	"": "0",
+	// 	"credentials": {
+	// 	  "scope": "GLOBAL",
+	// 	  "id": "auto-test2",
+	// 	  "username": "zdq0395",
+	// 	  "password": "c17551ff8604d4f1eff12accf27559ea5d9823a2",
+	// 	  "description": "accesstoken for zdq0395",
+	// 	  "$class": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl"
+	// 	}
+	//   }
+	// `
+	var cred template.CredentialsConfig
+	cred.CredID = "auto-test-888"
+	cred.UserName = "auto-test-Tom"
+	cred.Password = "auto-test-TomPassword"
+	cred.Description = "hello Tom"
+	config := cred.ToConfigString()
+	fmt.Println(config)
+	err := jenkins.CreateCredentials(fmt.Sprintf("json=%s", config))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getAllCredentials(jenkins *gojenkins.Jenkins) {
@@ -117,7 +127,8 @@ func main() {
 		panic("Something Went Wrong")
 	}
 
-	createBranchJob(jenkins)
-	createTagJob(jenkins)
-
+	//createBranchJob(jenkins)
+	//createTagJob(jenkins)
+	//createCredentials(jenkins)
+	jenkins.RemoveCredentials("auto-test-888")
 }
