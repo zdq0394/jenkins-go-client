@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/zdq0394/jenkins-go-client/gojenkins"
 	"github.com/zdq0394/jenkins-go-client/template"
+	gojenkins "github.com/zdq0394/z/jenkins"
 )
 
 func getAllJobs(jenkins *gojenkins.Jenkins) {
