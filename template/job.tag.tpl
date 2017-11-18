@@ -64,8 +64,10 @@
     <hudson.tasks.Shell>
 	  <command>
 
-COMMIT_ID=`git rev-parse --short HEAD`
-TAG=`git describe --tags`
+#!/bin/bash
+set -x -e
+COMMIT_ID=$(git rev-parse --short HEAD)
+TAG=$(git describe --tags)
 
 if [ $OVERRIDE = &quot;True&quot; ] ; then
     DOCKER_TAG=$TAG

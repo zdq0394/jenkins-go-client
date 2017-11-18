@@ -80,15 +80,15 @@ func getAllCredentials(jenkins *gojenkins.Jenkins) {
 func createBranchJob(jenkins *gojenkins.Jenkins) {
 	var branch template.JobBranchConfig
 	branch.ProjectURL = "https://github.com/zdq0394/docker_example"
-	branch.BranchName = "develop"
+	branch.BranchName = "test"
 	branch.Registry = "reg.qiniu.com"
 	branch.RepoNamespace = "zhangdongqi"
 	branch.RepoName = "docker_example"
-	branch.ImageTagPrefix = "develop"
+	branch.ImageTagPrefix = "test"
 	branch.Override = "True"
 	branch.CredentialsId = "zdq0394"
 	config := branch.ToConfigString()
-	jenkins.CreateJobInFolder(config, "AA", "hub", "zdq0394", "docker_example")
+	jenkins.CreateJobInFolder(config, "test", "hub", "zdq0394", "docker_example")
 }
 
 func createTagJob(jenkins *gojenkins.Jenkins) {
@@ -101,7 +101,7 @@ func createTagJob(jenkins *gojenkins.Jenkins) {
 	tag.CredentialsId = "zdq0394"
 	tag.ProjectTagLike = "release*"
 	config := tag.ToConfigString()
-	jenkins.CreateJobInFolder(config, "BB", "hub", "zdq0394", "docker_example")
+	jenkins.CreateJobInFolder(config, "tag_prefixed_release", "hub", "zdq0394", "docker_example")
 }
 
 func main() {
@@ -115,15 +115,8 @@ func main() {
 		panic("Something Went Wrong")
 	}
 
-	//createBranchJob(jenkins)
+	createBranchJob(jenkins)
 	//createTagJob(jenkins)
 	//createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
-	f, err := jenkins.CreateFolder("zdq0394", "hub")
-	if err != nil {
-		fmt.Println("err:", err.Error())
-	}
-	if f != nil {
-		fmt.Println(f.GetName())
-	}
 }

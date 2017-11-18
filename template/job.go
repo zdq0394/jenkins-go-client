@@ -2,9 +2,7 @@ package template
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 )
 
@@ -29,7 +27,7 @@ type JobTagConfig struct {
 }
 
 func (job JobBranchConfig) ToConfigString() string {
-	t := template.Must(template.New("escape").Parse(GetBranchTemplateFromFile()))
+	t := template.Must(template.New("escape").Parse(getJobBranchTemplate()))
 	config := bytes.NewBufferString("")
 	if err := t.Execute(config, job); err != nil {
 		log.Fatal(err)
@@ -38,26 +36,10 @@ func (job JobBranchConfig) ToConfigString() string {
 }
 
 func (job JobTagConfig) ToConfigString() string {
-	t := template.Must(template.New("escape").Parse(GetTagTemplateFromFile()))
+	t := template.Must(template.New("escape").Parse(getJobTagTemplate()))
 	config := bytes.NewBufferString("")
 	if err := t.Execute(config, job); err != nil {
 		log.Fatal(err)
 	}
 	return config.String()
-}
-
-func GetBranchTemplateFromFile() string {
-	return GetTemplate("../template/job.branch.tpl")
-}
-
-func GetTagTemplateFromFile() string {
-	return GetTemplate("../template/job.tag.tpl")
-}
-
-func GetTemplate(tmplPath string) string {
-	data, err := ioutil.ReadFile(tmplPath)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return string(data)
 }
