@@ -49,7 +49,13 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(build.GetConsoleOutput())
+	fmt.Println(build.GetActions())
+	fmt.Println(build.GetDuration())
+	fmt.Println(build.GetRevision())
+	fmt.Println(build.GetRevisionBranch())
+	fmt.Println(build.GetTimestamp())
+	fmt.Println(build.GetBuildNumber())
+	fmt.Println(build.GetResult())
 }
 
 func createCredentials(jenkins *gojenkins.Jenkins) {
@@ -115,8 +121,9 @@ func main() {
 		panic("Something Went Wrong")
 	}
 
-	createBranchJob(jenkins)
+	//createBranchJob(jenkins)
 	//createTagJob(jenkins)
 	//createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
+	getBuild(jenkins, "build_private", 20)
 }
