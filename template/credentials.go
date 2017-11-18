@@ -14,7 +14,7 @@ type CredentialsConfig struct {
 }
 
 func (c CredentialsConfig) ToConfigString() string {
-	t := template.Must(template.New("escape").Parse(GetCredentialsTemplateFromFile()))
+	t := template.Must(template.New("escape").Parse(GetCredentialsTemplate()))
 	config := bytes.NewBufferString("")
 	if err := t.Execute(config, c); err != nil {
 		log.Fatal(err)
@@ -22,6 +22,17 @@ func (c CredentialsConfig) ToConfigString() string {
 	return config.String()
 }
 
-func GetCredentialsTemplateFromFile() string {
-	return GetTemplate("../template/credentials.tpl")
+func GetCredentialsTemplate() string {
+	return `{
+		"": "0",
+		"credentials": {
+		"scope": "GLOBAL",
+		"id": "{{.CredID}}",
+		"username": "{{.UserName}}",
+		"password": "{{.Password}}",
+		"description": "{{.Description}}",
+		"$class": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl"
+		}
+	}
+	`
 }

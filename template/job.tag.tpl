@@ -66,7 +66,7 @@
 
 COMMIT_ID=`git rev-parse --short HEAD`
 TAG=`git describe --tags`
-COMMIT_ID=`git rev-parse --short HEAD`
+
 if [ $OVERRIDE = &quot;True&quot; ] ; then
     DOCKER_TAG=$TAG
 else
