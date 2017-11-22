@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/zdq0394/jenkins-go-client/template"
 	gojenkins "github.com/zdq0394/z/jenkins"
@@ -49,13 +50,18 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(build.GetActions())
-	fmt.Println(build.GetDuration())
-	fmt.Println(build.GetRevision())
-	fmt.Println(build.GetRevisionBranch())
-	fmt.Println(build.GetTimestamp())
-	fmt.Println(build.GetBuildNumber())
-	fmt.Println(build.GetResult())
+	if build.IsRunning() {
+		fmt.Println("IS RUNNING")
+	} else {
+		fmt.Println(build.GetActions())
+		fmt.Println(build.GetDuration())
+		fmt.Println(build.GetRevision())
+		fmt.Println(build.GetRevisionBranch())
+		fmt.Println(build.GetTimestamp())
+		fmt.Println(build.GetBuildNumber())
+		fmt.Println(build.GetResult())
+	}
+
 }
 
 func createCredentials(jenkins *gojenkins.Jenkins) {
@@ -110,6 +116,51 @@ func createTagJob(jenkins *gojenkins.Jenkins) {
 	jenkins.CreateJobInFolder(config, "tag_prefixed_release", "hub", "zdq0394", "docker_example")
 }
 
+func deleteJob(jenkins *gojenkins.Jenkins) {
+	job, err := jenkins.GetJob("test", "hub", "zdq0394", "docker_example")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(job.GetName())
+
+	ok, err := job.Delete()
+	if ok {
+		fmt.Println("OK")
+	} else {
+		fmt.Println("Not OK")
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func getDockerTagFromConsoleOutput(output string) string {
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		fmt.Println(line)
+		if strings.HasPrefix(line, "+ DOCKER_TAG=") {
+			return strings.TrimRight(line[13:], "\n")
+		}
+	}
+	return ""
+}
+
+func getDockerTag(jenkins *gojenkins.Jenkins) {
+	job, err := jenkins.GetJob("master", "hub", "zdq0394", "docker_example")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(job.Base)
+	b, err := job.GetBuild(1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("%v", b)
+	output := b.GetConsoleOutput()
+	dockerTag := getDockerTagFromConsoleOutput(output)
+	fmt.Println(dockerTag)
+}
+
 func main() {
 	jenkinsURL := "http://123.59.204.155:8080/"
 	username := "admin"
@@ -125,5 +176,6 @@ func main() {
 	//createTagJob(jenkins)
 	//createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
-	getBuild(jenkins, "build_private", 20)
+	//deleteJob(jenkins)
+
 }
