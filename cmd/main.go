@@ -66,7 +66,7 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 
 func createCredentials(jenkins *gojenkins.Jenkins) {
 	var cred template.CredentialsConfig
-	cred.CredID = "jack@github"
+	cred.CredID = "j@github"
 	cred.UserName = "auto-test-Tom"
 	cred.Password = "auto-test-TomPassword"
 	cred.Description = "hello Tom"
@@ -174,7 +174,7 @@ func main() {
 
 	//createBranchJob(jenkins)
 	//createTagJob(jenkins)
-	//createCredentials(jenkins)
+	createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
 	//deleteJob(jenkins)
 
