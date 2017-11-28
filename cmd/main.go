@@ -66,10 +66,10 @@ func getBuild(jenkins *gojenkins.Jenkins, jobName string, buildNumber int64) {
 
 func createCredentials(jenkins *gojenkins.Jenkins) {
 	var cred template.CredentialsConfig
-	cred.CredID = "j@github"
-	cred.UserName = "auto-test-Tom"
-	cred.Password = "auto-test-TomPassword"
-	cred.Description = "hello Tom"
+	cred.CredID = "zdq0394@github"
+	cred.UserName = "zdq0394"
+	cred.Password = "243e082c37a843418ff5841c3753d20ea3e92402"
+	cred.Description = "zdq0394 access token of github"
 	config := cred.ToConfigString()
 	fmt.Println(config)
 	err := jenkins.CreateCredentials(fmt.Sprintf("json=%s", config))
