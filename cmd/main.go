@@ -174,8 +174,11 @@ func main() {
 
 	//createBranchJob(jenkins)
 	//createTagJob(jenkins)
-	createCredentials(jenkins)
+	//createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
 	//deleteJob(jenkins)
+
+	//getJob(jenkins, "auto_build")
+	getAllCredentials(jenkins)
 
 }
