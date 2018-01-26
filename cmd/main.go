@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/zdq0394/jenkins-go-client/template"
 	gojenkins "github.com/zdq0394/z/jenkins"
@@ -98,9 +100,42 @@ func createBranchJob(jenkins *gojenkins.Jenkins) {
 	branch.RepoName = "docker_example"
 	branch.ImageTagPrefix = "test"
 	branch.Override = "True"
-	branch.CredentialsId = "zdq0394"
+	branch.CredentialsId = "zdq0394@github"
 	config := branch.ToConfigString()
-	jenkins.CreateJobInFolder(config, "test", "hub", "zdq0394", "docker_example")
+	var i int
+	for i = 101; i <= 180; i++ {
+		t_i := i
+		go func() {
+			jobName := fmt.Sprintf("loop%d", t_i)
+			fmt.Println(jobName)
+			_, err := jenkins.CreateJobInFolder(config, jobName, "hub", "zdq0394", "docker_example")
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+	}
+	select {}
+
+}
+
+func updateBranchJob(jenkins *gojenkins.Jenkins) {
+	var branch template.JobBranchConfig
+	branch.ProjectURL = "https://github.com/zdq0394/docker_example"
+	branch.BranchName = "test"
+	branch.Registry = "reg.qiniu.com"
+	branch.RepoNamespace = "zhangdongqi"
+	branch.RepoName = "docker_example"
+	branch.ImageTagPrefix = "Hahaha"
+	branch.Override = "True"
+	branch.CredentialsId = "zdq0394@github"
+	config := branch.ToConfigString()
+	job, err := jenkins.GetJob("test", "hub", "zdq0394", "docker_example")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(job.Base)
+	job.UpdateConfig(config)
 }
 
 func createTagJob(jenkins *gojenkins.Jenkins) {
@@ -145,6 +180,38 @@ func getDockerTagFromConsoleOutput(output string) string {
 	return ""
 }
 
+func getJobBuildLog(jenkins *gojenkins.Jenkins) {
+	job, err := jenkins.GetJob("5a265aa93b5a640001000001", "hub", "wzjgo", "2048")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(job.Base)
+	fmt.Println(job.GetBuildConsoleOutputWithTimestamp(1))
+}
+
+func getJobAllBuildIDS(jenkins *gojenkins.Jenkins) {
+	job, err := jenkins.GetJob("5a265aa93b5a640001000001", "hub", "wzjgo", "2048")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(job.Base)
+	fmt.Println(job.GetBuildConsoleOutputWithTimestamp(1))
+
+	b, err := job.GetBuild(1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("%v", b)
+	bIDs, _ := job.GetAllBuildInfos()
+	for _, bid := range bIDs {
+		fmt.Println(bid.Number)
+		fmt.Println(bid.URL)
+		fmt.Println(bid.Duration)
+		fmt.Println(bid.Timestamp)
+		fmt.Println(bid.Result)
+	}
+}
+
 func getDockerTag(jenkins *gojenkins.Jenkins) {
 	job, err := jenkins.GetJob("master", "hub", "zdq0394", "docker_example")
 	if err != nil {
@@ -162,23 +229,29 @@ func getDockerTag(jenkins *gojenkins.Jenkins) {
 }
 
 func main() {
-	jenkinsURL := "http://123.59.204.155:8080/"
+	jenkinsURL := "http://123.59.204.159"
 	username := "admin"
-	password := "a8ccd5481d6342b992543321928e1861"
+	password := "Qwer1234"
 	//jobName := "auto_build"
-	jenkins := gojenkins.CreateJenkins(nil, jenkinsURL, username, password)
+	client := http.DefaultClient
+	client.Timeout = 600 * time.Second
+	jenkins := gojenkins.CreateJenkins(client, jenkinsURL, username, password)
 	_, err := jenkins.Init()
 	if err != nil {
-		panic("Something Went Wrong")
+		fmt.Println(err)
 	}
 
-	//createBranchJob(jenkins)
+	createBranchJob(jenkins)
+	//updateBranchJob(jenkins)
 	//createTagJob(jenkins)
 	//createCredentials(jenkins)
 	//jenkins.RemoveCredentials("auto-test-888")
 	//deleteJob(jenkins)
 
 	//getJob(jenkins, "auto_build")
-	getAllCredentials(jenkins)
+	//getAllCredentials(jenkins)
+
+	//getJobAllBuildIDS(jenkins)
+	//getJobBuildLog(jenkins)
 
 }
